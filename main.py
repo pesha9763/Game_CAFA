@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 """для начала было бы неплохо написать
 всю разметку там, обозначить границы карты
@@ -129,7 +130,7 @@ def put_e(size, color, heal, fast):
     """создадим 10 неподвижных врагов
     for i in range(10):
         enem.append(enemy(i * side_s + side_s / 2, 6 * side_s + side_s / 2, 15, red, 10, 10))"""
-    for i in range(10):
+    for i in range(random.randint(10, 30)):
         x = check[0][0] - 200 - i*10 - 5
         y = check[0][1]
         enem.append(enemy(x, y, size, color, heal, fast))
@@ -287,30 +288,36 @@ def main():
         enemy.go_en()
     death_check()
     for weapon in weapons:
-        a = fcnmath(weapon.x, enem[0].x, weapon.y, enem[0].y)  # самый первый враг
-        weapon.go(a[0], a[1])
-        """уничтожение пули и урон врагу"""
-        if a[2] <= weapon.speed:
-            enem[0].heal -= weapon.death
-            weapons.remove(weapon)
-        weapon.draw()
+        if enem: # пули стреляли, а играков не было
+            a = fcnmath(weapon.x, enem[0].x, weapon.y, enem[0].y)  # самый первый враг
+            weapon.go(a[0], a[1])
+            """уничтожение пули и урон врагу"""
+            if a[2] <= weapon.speed:
+                enem[0].heal -= weapon.death
+                weapons.remove(weapon)
+            weapon.draw()
     death_check()
+
+
 
 
 do_r()
 checkpoin(8)
-put_e(10, red, 10, 3)
+put_e(8, red, 10, 3)
 # print(check)
 run = True
+# Добавим таймер для отрисовки игры каждый 30 миллисекунд (fps)
+timer_event = pygame.USEREVENT + 1
+pygame.time.set_timer(timer_event, fps)
+# Игровой цикл
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-
-        win.fill(black)
-        #put_e()
-        main()
-        pygame.display.update()
-        clock.tick(fps)
+        elif event.type == timer_event:
+            win.fill(black)
+            #put_e()
+            main()
+            pygame.display.update()
 
 pygame.quit()
